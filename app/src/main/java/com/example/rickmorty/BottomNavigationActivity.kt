@@ -31,6 +31,13 @@ class BottomNavigationActivity : AppCompatActivity(), NavigationView.OnNavigatio
                     .commit()
                 return true
             }
+            R.id.menu_locations -> {
+                binding.titleHeader.text = getString(R.string.locations)
+                supportFragmentManager.beginTransaction()
+                    .replace(binding.viewPager.id, LocationsFragment())
+                    .commit()
+                return true
+            }
             R.id.menu_episodes -> {
                 binding.titleHeader.text = getString(R.string.episodes)
                 supportFragmentManager.beginTransaction()

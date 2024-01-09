@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_characters" android:title="Characters" android:icon="@drawable/ic_characters" />
-    <item android:id="@+id/menu_episodes" android:title="Episodes" android:icon="@drawable/ic_television" />
-    <item android:id="@+id/menu_settings" android:title="Settings" android:icon="@drawable/ic_settings" />
+    <item android:id="@+id/menu_characters" android:title="@string/characters" android:icon="@drawable/ic_characters" />
+    <item android:id="@+id/menu_locations" android:title="@string/locations" android:icon="@drawable/ic_locations" />
+    <item android:id="@+id/menu_episodes" android:title="@string/episodes" android:icon="@drawable/ic_television" />
+    <item android:id="@+id/menu_settings" android:title="@string/settings" android:icon="@drawable/ic_settings" />
 </menu>
