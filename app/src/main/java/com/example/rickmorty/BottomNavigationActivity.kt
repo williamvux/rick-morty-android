@@ -25,18 +25,21 @@ class BottomNavigationActivity : AppCompatActivity(), NavigationView.OnNavigatio
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_characters -> {
+                binding.titleHeader.text = getString(R.string.characters)
                 supportFragmentManager.beginTransaction()
                     .replace(binding.viewPager.id, CharactersFragment())
                     .commit()
                 return true
             }
             R.id.menu_episodes -> {
+                binding.titleHeader.text = getString(R.string.episodes)
                 supportFragmentManager.beginTransaction()
                     .replace(binding.viewPager.id, EpisodesFragment())
                     .commit()
                 return true
             }
             R.id.menu_settings -> {
+                binding.titleHeader.text = getString(R.string.settings)
                 supportFragmentManager.beginTransaction()
                     .replace(binding.viewPager.id, SettingsFragment())
                     .commit()
