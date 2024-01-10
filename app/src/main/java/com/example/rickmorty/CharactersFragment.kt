@@ -3,15 +3,17 @@ package com.example.rickmorty
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.ConcatAdapter
 import com.example.rickmorty.adapter.CharactersAdapter
+import com.example.rickmorty.adapter.LoadMoreAdapter
 import com.example.rickmorty.databinding.CardItemCharacterBinding
 import com.example.rickmorty.databinding.FragmentCharactersBinding
+import com.example.rickmorty.databinding.LoadMoreIndicatorBinding
 import com.example.rickmorty.service.CharacterService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -33,12 +35,29 @@ class CharactersFragment : Fragment() {
 
     private fun renderListCharacters(context: Context) {
         CharacterService.shared.getAllCharacters { characters ->
-            val adapter = CharactersAdapter(characters.results) {inflater, viewGroup, attachToRoot ->
+            val contentAdapter = CharactersAdapter(characters.results) {inflater, viewGroup, attachToRoot ->
                 CardItemCharacterBinding.inflate(inflater, viewGroup, attachToRoot)
             }
+            var footerLayoutId = 0;
+            val footerAdapter = LoadMoreAdapter(listOf(0)) { inflater, viewGroup, attachToRoot ->
+                val layout = LoadMoreIndicatorBinding.inflate(inflater, viewGroup, attachToRoot)
+                footerLayoutId = layout.root.id
+                layout
+            }
+            val adapter = ConcatAdapter(contentAdapter, footerAdapter)
             CoroutineScope(Dispatchers.Main).launch {
                 binding.rcvListCharacters.adapter = adapter
                 binding.rcvListCharacters.layoutManager = GridLayoutManager(context, 2)
+                (binding.rcvListCharacters.layoutManager as GridLayoutManager)?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+                    override fun getSpanSize(position: Int): Int {
+                        Log.d("SPANCoUNT", position.toString())
+                        return when (adapter.getItemViewType(position)) {
+                            footerLayoutId -> 1
+                            else -> 2
+                        }
+                    }
+
+                }
                 binding.progressBar.visibility = View.GONE
                 binding.rcvListCharacters.visibility = View.VISIBLE
             }
