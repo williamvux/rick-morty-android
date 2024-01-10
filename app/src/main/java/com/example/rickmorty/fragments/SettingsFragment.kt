@@ -1,4 +1,4 @@
-package com.example.rickmorty
+package com.example.rickmorty.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment

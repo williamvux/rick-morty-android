@@ -1,10 +1,14 @@
-package com.example.rickmorty
+package com.example.rickmorty.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
+import com.example.rickmorty.fragments.EpisodesFragment
+import com.example.rickmorty.fragments.LocationsFragment
+import com.example.rickmorty.R
+import com.example.rickmorty.fragments.SettingsFragment
 import com.example.rickmorty.databinding.ActivityBottomNavigationBinding
+import com.example.rickmorty.fragments.CharactersFragment
 import com.google.android.material.navigation.NavigationView
 
 class BottomNavigationActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
