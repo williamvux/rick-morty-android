@@ -18,9 +18,9 @@ class CharacterService {
         val shared = CharacterService()
     }
 
-    fun getAllCharacters(callback: (Characters) -> Unit) {
+    fun getAllCharacters(page: Int = 1, callback: (Characters) -> Unit) {
         CoroutineScope(Dispatchers.IO).launch {
-            HttpClient.client.getCharacters().enqueue(object : Callback<Characters> {
+            HttpClient.client.getCharacters(page = page).enqueue(object : Callback<Characters> {
                 override fun onResponse(call: Call<Characters>, response: Response<Characters>) {
                     if (response.body() != null) {
                         callback(response.body()!!)

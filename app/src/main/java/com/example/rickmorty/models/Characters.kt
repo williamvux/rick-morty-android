@@ -11,7 +11,7 @@ data class Characters (
 data class Info (
     val count: Long,
     val pages: Long,
-    val next: String,
+    val next: String? = null,
     val prev: String? = null
 )
 

@@ -8,7 +8,7 @@
     <ImageView
             android:id="@+id/img_character"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="175dp"
             android:scaleType="fitXY"
             android:src="@drawable/ic_character"
             app:layout_constraintBottom_toTopOf="@+id/txt_name"
@@ -22,7 +22,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
-        android:paddingStart="10dp"
         android:text=""
         android:textSize="14sp"
         android:textStyle="bold"
@@ -37,7 +36,6 @@
         android:textSize="13sp"
         android:paddingTop="5dp"
         android:paddingBottom="10dp"
-        android:paddingStart="10dp"
         android:text=""
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />

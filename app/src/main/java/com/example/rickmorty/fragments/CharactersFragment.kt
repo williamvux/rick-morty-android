@@ -1,6 +1,6 @@
 package com.example.rickmorty.fragments
 
-import android.content.Context
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -17,57 +17,92 @@ import com.example.rickmorty.databinding.FragmentCharactersBinding
 import com.example.rickmorty.databinding.LoadMoreIndicatorBinding
 import com.example.rickmorty.models.Character
 import com.example.rickmorty.service.CharacterService
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.util.Timer
+import java.util.TimerTask
 
 
 class CharactersFragment : Fragment() {
+    private val TAG = "CharactersFragment"
     private var _binding: FragmentCharactersBinding? = null
     private val binding get() = _binding!!
+    private lateinit var adapter: CharactersAdapter
+    private val characters = mutableListOf<Character>()
+    private var nextPage: Int? = 2
+    private var job: Job? = null
+    private var isLoadingMore = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentCharactersBinding.inflate(inflater, container, false)
-        renderListCharacters(inflater.context)
+        adapter = CharactersAdapter(
+            characters,
+            object : IOnClickItem<Character> {
+                override fun onClickItem(item: Character) {
+                    Log.d(TAG, item.name)
+                }
+            }
+        ) { adapterInflater, viewGroup, attachToRoot ->
+            CardItemCharacterBinding.inflate(adapterInflater, viewGroup, attachToRoot)
+        }
+        val footerAdapter = LoadMoreAdapter(
+            listOf(0),
+        ) { adapterInflater, viewGroup, attachToRoot ->
+            LoadMoreIndicatorBinding.inflate(adapterInflater, viewGroup, attachToRoot)
+        }
+        val concatAdapter = ConcatAdapter(adapter, footerAdapter)
+        binding.rcvListCharacters.adapter = concatAdapter
+        val layoutManager = GridLayoutManager(context, 2)
+        binding.rcvListCharacters.layoutManager = layoutManager
+        renderListCharacters()
+        layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                if (position == characters.size && !isLoadingMore) {
+                    job?.cancel()
+                    job = CoroutineScope(Dispatchers.IO).launch {
+                        delay(300)
+                        loadMoreCharacters()
+                    }
+                }
+                return if (concatAdapter.getItemViewType(position) == 1) {
+                    layoutManager.spanCount
+                } else {
+                    1
+                }
+            }
+        }
+
         return binding.root
     }
 
-    private fun renderListCharacters(context: Context) {
+    @SuppressLint("NotifyDataSetChanged")
+    private fun renderListCharacters() {
         CharacterService.shared.getAllCharacters { characters ->
-            val contentAdapter = CharactersAdapter(
-                characters.results,
-                object : IOnClickItem<Character> {
-                    override fun onClickItem(item: Character) {
-                        Log.d("SPANCoUNT", item.name)
-                    }
-                }
-            ) { inflater, viewGroup, attachToRoot ->
-                CardItemCharacterBinding.inflate(inflater, viewGroup, attachToRoot)
-            }
-            var footerLayoutId = 0;
-            val footerAdapter = LoadMoreAdapter(listOf(0)) { inflater, viewGroup, attachToRoot ->
-                val layout = LoadMoreIndicatorBinding.inflate(inflater, viewGroup, attachToRoot)
-                footerLayoutId = layout.root.id
-                layout
-            }
-            val adapter = ConcatAdapter(contentAdapter, footerAdapter)
+            this.characters.addAll(0, characters.results)
             CoroutineScope(Dispatchers.Main).launch {
-                binding.rcvListCharacters.adapter = adapter
-                binding.rcvListCharacters.layoutManager = GridLayoutManager(context, 2)
-                (binding.rcvListCharacters.layoutManager as GridLayoutManager)?.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
-                    override fun getSpanSize(position: Int): Int {
-                        return when (adapter.getItemViewType(position)) {
-                            footerLayoutId -> 1
-                            else -> 2
-                        }
-                    }
-
-                }
+                adapter.notifyDataSetChanged()
                 binding.progressBar.visibility = View.GONE
                 binding.rcvListCharacters.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private fun loadMoreCharacters() {
+        isLoadingMore = true
+        Log.d(TAG, "loadMoreCharacters")
+        if (nextPage != null) {
+            CharacterService.shared.getAllCharacters(page = nextPage!!) { moreCharacters ->
+                val lastPrevIndex = this.characters.size
+                val next = moreCharacters.info.next
+                nextPage = next?.split("=")?.last()?.toInt()
+                this.characters.addAll(lastPrevIndex, moreCharacters.results)
+                CoroutineScope(Dispatchers.Main).launch {
+                    adapter.notifyItemRangeInserted(lastPrevIndex, moreCharacters.results.size)
+                    isLoadingMore = false
+                }
             }
         }
     }
