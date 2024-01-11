@@ -1,5 +1,6 @@
 package com.example.rickmorty.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.example.rickmorty.adapter.common.RecycleViewAdapter
@@ -16,5 +17,10 @@ class LoadMoreAdapter(
         binding: LoadMoreIndicatorBinding,
         item: Int
     ) {
+        Log.d("LoadMoreAdapter", item.toString())
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        return 0
     }
 }

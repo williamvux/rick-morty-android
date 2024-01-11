@@ -1,5 +1,6 @@
 package com.example.rickmorty.adapter
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.bumptech.glide.Glide
@@ -17,6 +18,7 @@ class CharactersAdapter(
         Character,
         CardItemCharacterBinding
         >(characters, viewBindingFactory) {
+    @SuppressLint("SetTextI18n")
     override fun bind(
         binding: CardItemCharacterBinding,
         item: Character
@@ -27,5 +29,12 @@ class CharactersAdapter(
         binding.root.setOnClickListener {
             onClickItem.onClickItem(item)
         }
+    }
+
+    override fun getItemViewType(position: Int): Int {
+        if (position > 9) {
+            return 2
+        }
+        return 1
     }
 }

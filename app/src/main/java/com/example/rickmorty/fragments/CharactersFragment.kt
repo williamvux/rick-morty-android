@@ -7,8 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import com.example.rickmorty.adapter.CharactersAdapter
 import com.example.rickmorty.adapter.LoadMoreAdapter
 import com.example.rickmorty.adapter.common.IOnClickItem
@@ -18,8 +18,6 @@ import com.example.rickmorty.databinding.LoadMoreIndicatorBinding
 import com.example.rickmorty.models.Character
 import com.example.rickmorty.service.CharacterService
 import kotlinx.coroutines.*
-import java.util.Timer
-import java.util.TimerTask
 
 
 class CharactersFragment : Fragment() {
@@ -52,10 +50,10 @@ class CharactersFragment : Fragment() {
         ) { adapterInflater, viewGroup, attachToRoot ->
             LoadMoreIndicatorBinding.inflate(adapterInflater, viewGroup, attachToRoot)
         }
-        val concatAdapter = ConcatAdapter(adapter, footerAdapter)
-        binding.rcvListCharacters.adapter = concatAdapter
+        val concatAdapter = ConcatAdapter(ConcatAdapter.Config.Builder().setIsolateViewTypes(false).build(), adapter, footerAdapter)
+//        concatAdapter.addAdapter(adapter)
+//        concatAdapter.addAdapter(footerAdapter)
         val layoutManager = GridLayoutManager(context, 2)
-        binding.rcvListCharacters.layoutManager = layoutManager
         renderListCharacters()
         layoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
             override fun getSpanSize(position: Int): Int {
@@ -66,14 +64,16 @@ class CharactersFragment : Fragment() {
                         loadMoreCharacters()
                     }
                 }
-                return if (concatAdapter.getItemViewType(position) == 1) {
-                    layoutManager.spanCount
+
+                return if (concatAdapter.getItemViewType(position) == 0) {
+                    2
                 } else {
                     1
                 }
             }
         }
-
+        binding.rcvListCharacters.adapter = concatAdapter
+        binding.rcvListCharacters.layoutManager = layoutManager
         return binding.root
     }
 
